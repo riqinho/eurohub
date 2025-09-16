@@ -12,7 +12,7 @@ class BottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: AppColors.kBg, // fundo branco do nav
+        color: AppColors.kCard, // fundo branco do nav
         boxShadow: [
           BoxShadow(
             blurRadius: 12,

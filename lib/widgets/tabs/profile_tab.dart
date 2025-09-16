@@ -10,7 +10,11 @@ class ProfileTab extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: const [
-          Icon(Icons.construction, size: 60, color: Colors.grey),
+          Icon(
+            Icons.construction,
+            size: 60,
+            color: Color.fromARGB(110, 158, 158, 158),
+          ),
           SizedBox(height: 12),
           Text(
             'Em construção',

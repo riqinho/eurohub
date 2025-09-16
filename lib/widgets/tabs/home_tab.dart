@@ -1,44 +1,52 @@
 import 'package:eurohub/theme/app_colors.dart';
+import 'package:eurohub/theme/app_text.dart';
 import 'package:flutter/material.dart';
 
-// Tipos de texto locais (opcional: pode mover p/ um theme depois)
-TextStyle get titleLg =>
-    const TextStyle(fontSize: 20, fontWeight: FontWeight.w700);
-TextStyle get titleMd =>
-    const TextStyle(fontSize: 16, fontWeight: FontWeight.w700);
-TextStyle get body => const TextStyle(fontSize: 14, color: AppColors.kMuted);
-
 class HomeTab extends StatelessWidget {
-  const HomeTab({super.key});
+  const HomeTab({super.key, required this.onNavigate});
+
+  final ValueChanged<int> onNavigate;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.kBg,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            // ---------- BLOCO 2: Header ----------
+            // ---------- BLOCO 1: Header ----------
             SliverToBoxAdapter(child: _Header()),
-            const SliverToBoxAdapter(child: SizedBox(height: 16)),
-            // ---------- BLOCO 4: Minha Jornada ----------
-            SliverToBoxAdapter(child: _MinhaJornadaCard()),
-            const SliverToBoxAdapter(child: SizedBox(height: 16)),
-            // ---------- BLOCO 5: Conquistas ----------
+            const SliverToBoxAdapter(child: SizedBox(height: 22)),
+            // ---------- BLOCO 2: Minha Jornada ----------
+            SliverToBoxAdapter(child: _SectionTitle(title: 'Minha Jornada')),
+            SliverToBoxAdapter(
+              child: LevelCard(level: 2, progress: 0.28, pointsToNext: 13),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 22)),
+            // ---------- BLOCO 3: Conquistas ----------
+            SliverToBoxAdapter(
+              child: _SectionTitle(title: 'Conquitas Recentes'),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 22)),
             SliverToBoxAdapter(child: _ConquistasRow()),
-            const SliverToBoxAdapter(child: SizedBox(height: 16)),
-            // ---------- BLOCO 6: Minhas contribuições ----------
+            const SliverToBoxAdapter(child: SizedBox(height: 22)),
+            // ---------- BLOCO 4: Minhas contribuições ----------
             SliverToBoxAdapter(
               child: _SectionTitle(
                 title: 'Minhas contribuições',
                 trailing: TextButton(
-                  onPressed: () {},
-                  child: const Text('Ver tudo'),
+                  onPressed: () {
+                    onNavigate(1);
+                  },
+                  child: const Text(
+                    'Ver tudo',
+                    style: TextStyle(color: AppColors.kMuted),
+                  ),
                 ),
               ),
             ),
             SliverToBoxAdapter(child: _ContribCard()),
-            const SliverToBoxAdapter(child: SizedBox(height: 20)),
+            const SliverToBoxAdapter(child: SizedBox(height: 22)),
             // ---------- BLOCO 7: Desenvolvimento & Cultura + chips ----------
             SliverToBoxAdapter(
               child: _SectionTitle(
@@ -52,8 +60,13 @@ class HomeTab extends StatelessWidget {
               child: _SectionTitle(
                 title: 'Desafios Ativos',
                 trailing: TextButton(
-                  onPressed: () {},
-                  child: const Text('Ver tudo'),
+                  onPressed: () {
+                    onNavigate(2);
+                  },
+                  child: const Text(
+                    'Ver tudo',
+                    style: TextStyle(color: AppColors.kMuted),
+                  ),
                 ),
               ),
             ),
@@ -66,7 +79,7 @@ class HomeTab extends StatelessWidget {
   }
 }
 
-// BLOCO 2 — Header com avatar + saudação
+// BLOCO 1 — Header com avatar + saudação
 class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -76,20 +89,18 @@ class _Header extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 16,
-            // backgroundImage: const AssetImage(
-            //   'assets/images/avatar.png',
-            // ), // troque pelo seu
+            backgroundImage: const AssetImage('assets/images/person.png'),
             backgroundColor: Colors.grey.shade300,
           ),
           const SizedBox(width: 8),
           Expanded(
             child: RichText(
               text: TextSpan(
-                style: const TextStyle(color: Colors.black, fontSize: 18),
+                style: const TextStyle(color: Colors.black, fontSize: 22),
                 children: const [
                   TextSpan(
                     text: 'Boa-tarde, ',
-                    style: TextStyle(fontWeight: FontWeight.w400),
+                    style: TextStyle(fontWeight: FontWeight.w700),
                   ),
                   TextSpan(
                     text: 'Marina',
@@ -109,110 +120,63 @@ class _Header extends StatelessWidget {
   }
 }
 
-// BLOCO 3 — Barra de busca “pílula”
-class _SearchPill extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
-      child: Container(
-        height: 44,
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        decoration: BoxDecoration(
-          color: AppColors.kPill,
-          borderRadius: BorderRadius.circular(22),
-        ),
-        child: Row(
-          children: const [
-            Icon(Icons.search_rounded, color: AppColors.kLabel),
-            SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Buscar por nome, categoria, área…',
-                style: TextStyle(color: AppColors.kLabel, fontSize: 15),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+// BLOCO 2 — Card “Minha Jornada”
+class LevelCard extends StatelessWidget {
+  const LevelCard({
+    super.key,
+    required this.level,
+    required this.progress,
+    required this.pointsToNext,
+  });
 
-// BLOCO 4 — Card “Minha Jornada”
-class _MinhaJornadaCard extends StatelessWidget {
+  final int level;
+  final double progress;
+  final int pointsToNext;
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.kCard,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [
-            BoxShadow(
-              blurRadius: 10,
-              color: Color(0x11000000),
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Card(
+        color: AppColors.kPill,
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Minha Jornada',
-                      style: TextStyle(fontSize: 14, color: AppColors.kMuted),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5FF),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        children: [
-                          const Expanded(
-                            child: Text(
-                              'Nível 2',
-                              style: TextStyle(fontWeight: FontWeight.w700),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: const Color(0xFFE5E7EB),
-                              ),
-                            ),
-                            child: const Text(
-                              '13 pontos para 3',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.kMuted,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+              Text(
+                'Nível $level',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(width: 8),
-              Icon(Icons.chevron_right, color: AppColors.kLabel),
+              const SizedBox(height: 12),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(999),
+                child: TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 700),
+                  curve: Curves.easeOut,
+                  tween: Tween(begin: 0, end: progress.clamp(0, 1)),
+                  builder: (context, value, _) {
+                    return LinearProgressIndicator(
+                      value: value,
+                      minHeight: 10,
+                      backgroundColor: theme.colorScheme.outlineVariant,
+                      valueColor: AlwaysStoppedAnimation(AppColors.kHeaderTop),
+                    );
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 12),
+              Text(
+                '$pointsToNext pontos para nível ${level + 1}',
+                style: theme.textTheme.bodyMedium,
+              ),
             ],
           ),
         ),
@@ -221,7 +185,7 @@ class _MinhaJornadaCard extends StatelessWidget {
   }
 }
 
-// BLOCO 5 — Conquistas (3 troféus)
+// BLOCO 3 — Conquistas (3 troféus)
 class _ConquistasRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -237,11 +201,6 @@ class _ConquistasRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Conquistas recentes',
-            style: TextStyle(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 12),
           Row(
             children: [
               pill(Icons.emoji_events_outlined),
@@ -300,11 +259,14 @@ class _ContribCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              Text('Monitoramento Inteligente via IoT', style: titleMd),
+              Text(
+                'Monitoramento Inteligente via IoT',
+                style: AppTextStyles.titleMd,
+              ),
               const SizedBox(height: 6),
               Text(
                 'Utilizar sensores de IoT nas linhas de embalagem para monitorar em tempo real o desempenho...',
-                style: body,
+                style: AppTextStyles.body,
               ),
               const SizedBox(height: 12),
               Row(
@@ -335,39 +297,50 @@ class _ContribCard extends StatelessWidget {
 }
 
 // BLOCO 7 — Chips “Áreas de Inovação”
-class _ChipsArea extends StatelessWidget {
+class _ChipsArea extends StatefulWidget {
+  @override
+  State<_ChipsArea> createState() => _ChipsAreaState();
+}
+
+class _ChipsAreaState extends State<_ChipsArea> {
+  final chips = const [
+    'Data',
+    'Six Sigma',
+    'Ventures',
+    'Open Innovation',
+    'Design',
+  ];
+  int selected = 0; // “Data” inicialmente
+
   @override
   Widget build(BuildContext context) {
-    final chips = [
-      'Data',
-      'Six Sigma',
-      'Ventures',
-      'Open Innovation',
-      'Design',
-    ];
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children:
-            chips
-                .map(
-                  (c) => FilterChip(
-                    selected: c == 'Data',
-                    label: Text(c),
-                    onSelected: (_) {},
-                    selectedColor: const Color(0xFFEAF3FF),
-                    labelStyle: TextStyle(
-                      color: c == 'Data' ? AppColors.kPrimary : Colors.black87,
-                    ),
-                    shape: StadiumBorder(
-                      side: BorderSide(color: const Color(0xFFE5E7EB)),
-                    ),
-                    backgroundColor: Colors.white,
-                  ),
-                )
-                .toList(),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: List.generate(chips.length, (i) {
+            final isSelected = i == selected;
+            return Padding(
+              padding: EdgeInsets.only(right: i == chips.length - 1 ? 0 : 8),
+              child: FilterChip(
+                showCheckmark: false, // ① sem check
+                selected: isSelected,
+                label: Text(chips[i]),
+                onSelected: (_) => setState(() => selected = i),
+                selectedColor: const Color(
+                  0xFFD7E7FF,
+                ), // ② cor + escura quando selecionado
+                backgroundColor: const Color(0xFFEAF3FF),
+                labelStyle: TextStyle(
+                  color: isSelected ? AppColors.kHeaderTop : Colors.black87,
+                  fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+                ),
+                shape: StadiumBorder(side: BorderSide(color: AppColors.kPill)),
+              ),
+            );
+          }),
+        ),
       ),
     );
   }
@@ -414,12 +387,12 @@ class _DesafioCard extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 'Transformação digital para farmácias independentes',
-                style: titleMd,
+                style: AppTextStyles.titleMd,
               ),
               const SizedBox(height: 6),
               Text(
                 'Como podemos apoiar farmácias independentes em seu processo de transformação digital?',
-                style: body,
+                style: AppTextStyles.body,
               ),
             ],
           ),
@@ -441,7 +414,12 @@ class _SectionTitle extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
       child: Row(
         children: [
-          Expanded(child: Text(title, style: titleLg.copyWith(fontSize: 18))),
+          Expanded(
+            child: Text(
+              title,
+              style: AppTextStyles.titleLg.copyWith(fontSize: 18),
+            ),
+          ),
           if (trailing != null) trailing!,
         ],
       ),

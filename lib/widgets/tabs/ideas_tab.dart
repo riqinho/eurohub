@@ -1,12 +1,6 @@
 import 'package:eurohub/theme/app_colors.dart';
+import 'package:eurohub/theme/app_text.dart';
 import 'package:flutter/material.dart';
-
-// Tipos de texto locais (opcional: pode mover p/ um theme depois)
-TextStyle get titleLg =>
-    const TextStyle(fontSize: 20, fontWeight: FontWeight.w700);
-TextStyle get titleMd =>
-    const TextStyle(fontSize: 16, fontWeight: FontWeight.w700);
-TextStyle get body => const TextStyle(fontSize: 14, color: AppColors.kMuted);
 
 class IdeasTab extends StatelessWidget {
   const IdeasTab({super.key});
@@ -14,7 +8,7 @@ class IdeasTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.kBg,
+      backgroundColor: AppColors.kCard,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -41,7 +35,7 @@ class Header extends StatelessWidget {
       child: Expanded(
         child: RichText(
           text: TextSpan(
-            style: const TextStyle(color: Colors.black, fontSize: 18),
+            style: const TextStyle(color: Colors.black, fontSize: 22),
             children: const [
               TextSpan(
                 text: 'Minhas Ideias',
@@ -56,39 +50,50 @@ class Header extends StatelessWidget {
 }
 
 // BLOCO 2 - STATUS
-class ChipsStatus extends StatelessWidget {
+class ChipsStatus extends StatefulWidget {
+  @override
+  State<ChipsStatus> createState() => ChipsStatusState();
+}
+
+class ChipsStatusState extends State<ChipsStatus> {
+  final chips = const [
+    'Tudo',
+    'Em análise',
+    'Melhoria Solicitada',
+    'Recusada',
+    'Aprovada',
+  ];
+  int selected = 0; // “Data” inicialmente
+
   @override
   Widget build(BuildContext context) {
-    final chips = [
-      'Data',
-      'Six Sigma',
-      'Ventures',
-      'Open Innovation',
-      'Design',
-    ];
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children:
-            chips
-                .map(
-                  (c) => FilterChip(
-                    selected: c == 'Data',
-                    label: Text(c),
-                    onSelected: (_) {},
-                    selectedColor: const Color(0xFFEAF3FF),
-                    labelStyle: TextStyle(
-                      color: c == 'Data' ? AppColors.kPrimary : Colors.black87,
-                    ),
-                    shape: StadiumBorder(
-                      side: BorderSide(color: const Color(0xFFE5E7EB)),
-                    ),
-                    backgroundColor: Colors.white,
-                  ),
-                )
-                .toList(),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: List.generate(chips.length, (i) {
+            final isSelected = i == selected;
+            return Padding(
+              padding: EdgeInsets.only(right: i == chips.length - 1 ? 0 : 8),
+              child: FilterChip(
+                showCheckmark: false, // ① sem check
+                selected: isSelected,
+                label: Text(chips[i]),
+                onSelected: (_) => setState(() => selected = i),
+                selectedColor: const Color(
+                  0xFFD7E7FF,
+                ), // ② cor + escura quando selecionado
+                backgroundColor: const Color(0xFFEAF3FF),
+                labelStyle: TextStyle(
+                  color: isSelected ? AppColors.kHeaderTop : Colors.black87,
+                  fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+                ),
+                shape: StadiumBorder(side: BorderSide(color: AppColors.kPill)),
+              ),
+            );
+          }),
+        ),
       ),
     );
   }
@@ -137,11 +142,14 @@ class ContribCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              Text('Monitoramento Inteligente via IoT', style: titleMd),
+              Text(
+                'Monitoramento Inteligente via IoT',
+                style: AppTextStyles.titleMd,
+              ),
               const SizedBox(height: 6),
               Text(
                 'Utilizar sensores de IoT nas linhas de embalagem para monitorar em tempo real o desempenho...',
-                style: body,
+                style: AppTextStyles.body,
               ),
               const SizedBox(height: 12),
               Row(
