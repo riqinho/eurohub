@@ -1,156 +1,270 @@
+import 'package:eurohub/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  bool _obscure = true;
+
+  // Decoração reutilizável para os campos tipo “pílula”
+  InputDecoration _pillDecoration({
+    required String hint,
+    required IconData prefix,
+    Widget? suffix,
+  }) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(color: AppColors.kLabel, fontSize: 16),
+      prefixIcon: Icon(prefix, color: AppColors.kLabel),
+      suffixIcon: suffix,
+      filled: true,
+      fillColor: AppColors.kFieldFill,
+      contentPadding: const EdgeInsets.symmetric(vertical: 18),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(28),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(28),
+        borderSide: const BorderSide(color: AppColors.kPrimary, width: 1.2),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.kCard,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Header
+              // ---------- HEADER ----------
               SizedBox(
                 height: 350,
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
+                    // Gradiente
                     Container(
                       decoration: const BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
-                          colors: [Color(0xFF005EA2), Color(0xFF00A1E0)],
+                          colors: [
+                            AppColors.kHeaderTop,
+                            AppColors.kHeaderBottom,
+                          ],
                         ),
                       ),
                     ),
+                    // Logo central
                     Center(
                       child: SvgPicture.asset(
                         'assets/images/euro-logo.svg',
                         height: 64,
                       ),
                     ),
+                    // Wave que “encaixa” no branco
                     Positioned(
                       left: 0,
                       right: 0,
-                      bottom: -55, // “encaixa” na área branca
+                      bottom: -55,
                       child: SvgPicture.asset(
                         'assets/images/wave.svg',
                         width: w,
-                        fit:
-                            BoxFit.cover, // ou BoxFit.fill (depende do seu SVG)
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ],
                 ),
               ),
+
+              // ---------- CONTEÚDO ----------
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
+                    // Título
+                    const Text(
                       'Bem-vindo de Volta!',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.kPrimary,
                       ),
                     ),
+                    const SizedBox(height: 8),
+                    // Subtítulo
                     const Text(
-                      'Seu espaço de inovação e crescimento na Eurofarma',
+                      'Seu espaço de inovação e crescimento na Eurofarma.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(fontSize: 14, color: AppColors.kMuted),
                     ),
+
                     const SizedBox(height: 40),
+
+                    // Campo Email (pílula + ícone à esquerda)
                     TextField(
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
                       keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      decoration: _pillDecoration(
+                        hint: 'Email',
+                        prefix: Icons.email_outlined,
+                      ),
                     ),
-                    const SizedBox(height: 20),
+
+                    const SizedBox(height: 16),
+
+                    // Campo Senha (pílula + cadeado + olho mostrar/ocultar)
                     TextField(
-                      decoration: InputDecoration(
-                        labelText: 'Senha',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+                      obscureText: _obscure,
+                      textInputAction: TextInputAction.done,
+                      decoration: _pillDecoration(
+                        hint: 'Senha',
+                        prefix: Icons.lock_outline,
+                        suffix: IconButton(
+                          onPressed: () => setState(() => _obscure = !_obscure),
+                          icon: Icon(
+                            _obscure
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: AppColors.kMuted,
+                          ),
                         ),
                       ),
-                      keyboardType: TextInputType.visiblePassword,
-                      obscureText: true,
                     ),
-                    Text(
-                      "esqueci minha senha",
-                      textAlign: TextAlign.start,
-                      style: TextStyle(color: Colors.blue),
+
+                    const SizedBox(height: 8),
+
+                    // Esqueci minha senha
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          foregroundColor: AppColors.kPrimary,
+                        ),
+                        onPressed: () {
+                          // TODO: navegue para sua tela de recuperação
+                          // Navigator.pushNamed(context, '/forgot');
+                        },
+                        child: const Text('Esqueci minha senha'),
+                      ),
                     ),
+
                     const SizedBox(height: 40),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/home');
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+
+                    // Botão Entrar (pílula azul)
+                    SizedBox(
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/home');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.kPrimary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Text(
+                          'Entrar',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                      child: const Text(
-                        'Entrar',
-                        style: TextStyle(fontSize: 18),
-                      ),
                     ),
+
                     const SizedBox(height: 20),
+
+                    // Divisor "ou entre com"
                     Row(
                       children: const [
                         Expanded(child: Divider()),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 8),
-                          child: Text('ou entre com'),
+                          child: Text(
+                            'ou entre com',
+                            style: TextStyle(color: AppColors.kMuted),
+                          ),
                         ),
                         Expanded(child: Divider()),
                       ],
                     ),
+
                     const SizedBox(height: 20),
+
+                    // Botões sociais circulares (branco + leve sombra)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.fingerprint),
+                        _SocialCircle(
+                          child: Image.asset(
+                            'assets/images/google.png',
+                            height: 24,
+                          ),
+                          onTap: () {},
                         ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.fingerprint),
+                        const SizedBox(width: 16),
+                        _SocialCircle(
+                          child: Image.asset(
+                            'assets/images/facebook.png',
+                            height: 24,
+                          ),
+                          onTap: () {},
                         ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.fingerprint),
+                        const SizedBox(width: 16),
+                        _SocialCircle(
+                          child: Image.asset(
+                            'assets/images/apple.png',
+                            height: 24,
+                          ),
+                          onTap: () {},
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Não tem uma conta?"),
-                        Text(
-                          " Cadastre-se",
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                      ],
+
+                    const SizedBox(height: 35),
+
+                    // Rodapé
+                    Center(
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          const Text('Não tem uma conta? '),
+                          GestureDetector(
+                            onTap: () {
+                              // TODO: navegue para cadastro
+                              // Navigator.pushNamed(context, '/register');
+                            },
+                            child: const Text(
+                              'Registre-se agora',
+                              style: TextStyle(
+                                color: AppColors.kPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -158,6 +272,27 @@ class LoginScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// Botão social circular com sombra suave
+class _SocialCircle extends StatelessWidget {
+  final Widget child;
+  final VoidCallback onTap;
+  const _SocialCircle({required this.child, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      shape: const CircleBorder(),
+      elevation: 1.5,
+      color: Colors.white,
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: Padding(padding: const EdgeInsets.all(14), child: child),
       ),
     );
   }
