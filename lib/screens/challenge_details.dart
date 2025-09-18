@@ -1,3 +1,4 @@
+import 'package:eurohub/routes.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
@@ -17,7 +18,7 @@ class ChallengeDetailsScreen extends StatelessWidget {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: AppColors.kBg,
+        backgroundColor: AppColors.kCard,
         body: NestedScrollView(
           headerSliverBuilder:
               (context, innerBoxIsScrolled) => [
@@ -139,8 +140,7 @@ class ChallengeDetailsScreen extends StatelessWidget {
                     height: 48,
                     child: ElevatedButton(
                       onPressed: () {
-                        // TODO: navegue para a tela de envio
-                        // Navigator.pushNamed(context, Routes.submitIdea, arguments: {...});
+                        Navigator.pushNamed(context, Routes.chat);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.kPrimary,

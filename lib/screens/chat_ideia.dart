@@ -1,13 +1,18 @@
 import 'package:eurohub/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
-class ProfileTab extends StatelessWidget {
-  const ProfileTab({super.key});
+class ChatIdeiaScreen extends StatelessWidget {
+  const ChatIdeiaScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.kCard,
+      appBar: AppBar(
+        backgroundColor: AppColors.kCard,
+        elevation: 0,
+        automaticallyImplyLeading: true,
+      ),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

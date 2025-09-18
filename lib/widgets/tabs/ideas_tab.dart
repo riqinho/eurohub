@@ -1,6 +1,11 @@
+import 'package:eurohub/data/idea_repository.dart';
+import 'package:eurohub/models/ideia.dart';
 import 'package:eurohub/theme/app_colors.dart';
 import 'package:eurohub/theme/app_text.dart';
 import 'package:flutter/material.dart';
+
+// seu card renomeado para `Idea`:
+import 'package:eurohub/widgets/idea_card.dart';
 
 class IdeasTab extends StatelessWidget {
   const IdeasTab({super.key});
@@ -12,11 +17,82 @@ class IdeasTab extends StatelessWidget {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            SliverToBoxAdapter(child: Header()),
+            const SliverToBoxAdapter(child: _Header()),
             const SliverToBoxAdapter(child: SizedBox(height: 8)),
-            SliverToBoxAdapter(child: ChipsStatus()),
-            const SliverToBoxAdapter(child: SizedBox(height: 20)),
-            SliverToBoxAdapter(child: ContribCard()),
+            const SliverToBoxAdapter(child: ChipsStatus()),
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
+
+            // Lista vertical vindo do JSON (assets/mock/...)
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: 24),
+              sliver: FutureBuilder<List<Idea>>(
+                future: IdeaRepository.loadFromAssets(),
+                builder: (context, snap) {
+                  if (snap.connectionState == ConnectionState.waiting) {
+                    return const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 24,
+                        ),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                    );
+                  }
+                  if (snap.hasError) {
+                    return SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 24,
+                        ),
+                        child: Text(
+                          'Erro ao carregar: ${snap.error}',
+                          style: AppTextStyles.body,
+                        ),
+                      ),
+                    );
+                  }
+
+                  final itens = snap.data ?? [];
+                  if (itens.isEmpty) {
+                    return const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 24,
+                        ),
+                        child: Text('Você ainda não enviou ideias.'),
+                      ),
+                    );
+                  }
+
+                  // SliverList => lista vertical, estilo RecyclerView
+                  return SliverList.separated(
+                    itemCount: itens.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (context, i) {
+                      final c = itens[i];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: IdeaCard(
+                          // <- se seu widget se chamar IdeaCard, troque para IdeaCard
+                          statusLabel: c.status,
+                          title: c.title,
+                          summary: c.summary,
+                          votes: c.votes,
+                          date: c.date,
+                          statusColor: _mapStatusBg(c.status),
+                          onTap: () {
+                            // TODO: navegar para detalhe
+                          },
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -24,35 +100,29 @@ class IdeasTab extends StatelessWidget {
   }
 }
 
-// BLOCO 1 - HEADER
-class Header extends StatelessWidget {
-  const Header({super.key});
+// ---------------- HEADER ----------------
+class _Header extends StatelessWidget {
+  const _Header();
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      child: Expanded(
-        child: RichText(
-          text: TextSpan(
-            style: const TextStyle(color: Colors.black, fontSize: 22),
-            children: const [
-              TextSpan(
-                text: 'Minhas Ideias',
-                style: TextStyle(fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: Text(
+        'Minhas Ideias',
+        style: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+          color: Colors.black,
         ),
       ),
     );
   }
 }
 
-// BLOCO 2 - STATUS
+// --------------- STATUS CHIPS ---------------
 class ChipsStatus extends StatefulWidget {
   const ChipsStatus({super.key});
-
   @override
   State<ChipsStatus> createState() => ChipsStatusState();
 }
@@ -66,7 +136,6 @@ class ChipsStatusState extends State<ChipsStatus> {
     'Aprovada',
   ];
 
-  /// Aqui você define a cor para cada status na mesma ordem da lista acima
   final chipColors = const [
     Color(0xFFEAF3FF), // Tudo
     Color(0xFFEFF8FF), // Em análise
@@ -93,10 +162,9 @@ class ChipsStatusState extends State<ChipsStatus> {
                 selected: isSelected,
                 label: Text(chips[i]),
                 onSelected: (_) => setState(() => selected = i),
-                selectedColor: chipColors[i].withOpacity(0.8), // cor mais escura
-                backgroundColor: chipColors[i], // cor de fundo
+                selectedColor: chipColors[i].withOpacity(0.8),
+                backgroundColor: chipColors[i],
                 labelStyle: TextStyle(
-                  color: isSelected ? AppColors.kHeaderTop : Colors.black87,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
                 shape: StadiumBorder(
@@ -111,83 +179,18 @@ class ChipsStatusState extends State<ChipsStatus> {
   }
 }
 
-
-//  BLOCO 3 - IDEIAS
-class ContribCard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.kCard,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [
-            BoxShadow(
-              blurRadius: 10,
-              color: Color(0x11000000),
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // status chip
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEFF8FF),
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: const Color(0xFFD0E3FF)),
-                  ),
-                  child: const Text(
-                    'Em análise',
-                    style: TextStyle(fontSize: 12, color: AppColors.kPrimary),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Monitoramento Inteligente via IoT',
-                style: AppTextStyles.titleMd,
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Utilizar sensores de IoT nas linhas de embalagem para monitorar em tempo real o desempenho...',
-                style: AppTextStyles.body,
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Icon(
-                    Icons.favorite_border,
-                    size: 18,
-                    color: AppColors.kLabel,
-                  ),
-                  const SizedBox(width: 6),
-                  const Text(
-                    '0 votos',
-                    style: TextStyle(fontSize: 12, color: AppColors.kMuted),
-                  ),
-                  const Spacer(),
-                  const Text(
-                    '04 de Mai, 2025',
-                    style: TextStyle(fontSize: 12, color: AppColors.kMuted),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+// ---------- util: mapeia cor do chip no card ----------
+Color _mapStatusBg(String status) {
+  switch (status) {
+    case 'Em análise':
+      return const Color(0xFFEFF8FF);
+    case 'Aprovada':
+      return const Color(0xFFE8F5E9);
+    case 'Recusada':
+      return const Color(0xFFFFEBEE);
+    case 'Melhoria Solicitada':
+      return const Color(0xFFFFF5E6);
+    default:
+      return const Color(0xFFEAF3FF);
   }
 }

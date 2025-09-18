@@ -1,7 +1,17 @@
+import 'package:eurohub/data/challenge_repository.dart';
+import 'package:eurohub/data/idea_repository.dart';
+import 'package:eurohub/models/challenge.dart';
+import 'package:eurohub/models/ideia.dart';
+import 'package:eurohub/routes.dart';
 import 'package:eurohub/theme/app_colors.dart';
 import 'package:eurohub/theme/app_text.dart';
+import 'package:eurohub/widgets/challenge_card.dart';
+import 'package:eurohub/widgets/idea_card.dart'; // (se não usar, pode remover)
+import 'package:eurohub/widgets/tabs/ideas_tab.dart'; // (se não usar, pode remover)
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+// ====== Home Tab =================================================
 class HomeTab extends StatelessWidget {
   const HomeTab({super.key, required this.onNavigate});
 
@@ -15,29 +25,32 @@ class HomeTab extends StatelessWidget {
         child: CustomScrollView(
           slivers: [
             // ---------- BLOCO 1: Header ----------
-            SliverToBoxAdapter(child: _Header()),
+            const SliverToBoxAdapter(child: _Header()),
             const SliverToBoxAdapter(child: SizedBox(height: 22)),
+
             // ---------- BLOCO 2: Minha Jornada ----------
-            SliverToBoxAdapter(child: _SectionTitle(title: 'Minha Jornada')),
-            SliverToBoxAdapter(
+            const SliverToBoxAdapter(
+              child: _SectionTitle(title: 'Minha Jornada'),
+            ),
+            const SliverToBoxAdapter(
               child: LevelCard(level: 2, progress: 0.28, pointsToNext: 13),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 22)),
+
             // ---------- BLOCO 3: Conquistas ----------
-            SliverToBoxAdapter(
-              child: _SectionTitle(title: 'Conquitas Recentes'),
+            const SliverToBoxAdapter(
+              child: _SectionSubTitle(title: 'Conquistas Recentes'),
             ),
+            const SliverToBoxAdapter(child: SizedBox(height: 10)),
+            const SliverToBoxAdapter(child: _ConquistasRow()),
             const SliverToBoxAdapter(child: SizedBox(height: 22)),
-            SliverToBoxAdapter(child: _ConquistasRow()),
-            const SliverToBoxAdapter(child: SizedBox(height: 22)),
-            // ---------- BLOCO 4: Minhas contribuições ----------
+
+            // ---------- BLOCO 4: Minhas contribuições (carrossel + JSON) ----------
             SliverToBoxAdapter(
-              child: _SectionTitle(
+              child: _SectionSubTitle(
                 title: 'Minhas contribuições',
                 trailing: TextButton(
-                  onPressed: () {
-                    onNavigate(1);
-                  },
+                  onPressed: () => onNavigate(1), // vai para a guia IDEIAS
                   child: const Text(
                     'Ver tudo',
                     style: TextStyle(color: AppColors.kMuted),
@@ -45,24 +58,29 @@ class HomeTab extends StatelessWidget {
                 ),
               ),
             ),
-            SliverToBoxAdapter(child: _ContribCard()),
+            const _MinhasIdeiasSliver(), // <<< carrossel horizontal
             const SliverToBoxAdapter(child: SizedBox(height: 22)),
+
             // ---------- BLOCO 7: Desenvolvimento & Cultura + chips ----------
-            SliverToBoxAdapter(
+            const SliverToBoxAdapter(
               child: _SectionTitle(
                 title: 'Desenvolvimento & Cultura Eurofarma',
               ),
             ),
+            const SliverToBoxAdapter(child: SizedBox(height: 15)),
+            const SliverToBoxAdapter(
+              child: _SectionSubTitle(title: 'Áreas de Inovação'),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 10)),
             SliverToBoxAdapter(child: _ChipsArea()),
             const SliverToBoxAdapter(child: SizedBox(height: 20)),
-            // ---------- BLOCO 8: Desafios Ativos ----------
+
+            // ---------- BLOCO 8: Desafios Ativos (carrossel) ----------
             SliverToBoxAdapter(
-              child: _SectionTitle(
+              child: _SectionSubTitle(
                 title: 'Desafios Ativos',
                 trailing: TextButton(
-                  onPressed: () {
-                    onNavigate(2);
-                  },
+                  onPressed: () => onNavigate(2), // vai para a guia DESAFIOS
                   child: const Text(
                     'Ver tudo',
                     style: TextStyle(color: AppColors.kMuted),
@@ -70,7 +88,7 @@ class HomeTab extends StatelessWidget {
                 ),
               ),
             ),
-            SliverToBoxAdapter(child: _DesafioCard()),
+            const _DesafiosAtivosSliver(), // <<< carrossel horizontal
             const SliverToBoxAdapter(child: SizedBox(height: 32)),
           ],
         ),
@@ -79,8 +97,10 @@ class HomeTab extends StatelessWidget {
   }
 }
 
-// BLOCO 1 — Header com avatar + saudação
+// ====================== BLOCO 1 — Header ========================
 class _Header extends StatelessWidget {
+  const _Header();
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -93,11 +113,11 @@ class _Header extends StatelessWidget {
             backgroundColor: Colors.grey.shade300,
           ),
           const SizedBox(width: 8),
-          Expanded(
-            child: RichText(
-              text: TextSpan(
-                style: const TextStyle(color: Colors.black, fontSize: 22),
-                children: const [
+          const Expanded(
+            child: Text.rich(
+              TextSpan(
+                style: TextStyle(color: Colors.black, fontSize: 22),
+                children: [
                   TextSpan(
                     text: 'Boa-tarde, ',
                     style: TextStyle(fontWeight: FontWeight.w700),
@@ -120,7 +140,7 @@ class _Header extends StatelessWidget {
   }
 }
 
-// BLOCO 2 — Card “Minha Jornada”
+// ================== BLOCO 2 — Card “Minha Jornada” ==============
 class LevelCard extends StatelessWidget {
   const LevelCard({
     super.key,
@@ -171,7 +191,6 @@ class LevelCard extends StatelessWidget {
                   },
                 ),
               ),
-
               const SizedBox(height: 12),
               Text(
                 '$pointsToNext pontos para nível ${level + 1}',
@@ -185,119 +204,149 @@ class LevelCard extends StatelessWidget {
   }
 }
 
-// BLOCO 3 — Conquistas (3 troféus)
+// ================= BLOCO 3 — Conquistas (3 troféus) =============
 class _ConquistasRow extends StatelessWidget {
+  const _ConquistasRow();
+
   @override
   Widget build(BuildContext context) {
     Widget pill(IconData icon) => Container(
       width: 56,
       height: 56,
-      decoration: BoxDecoration(color: AppColors.kPill, shape: BoxShape.circle),
+      decoration: const BoxDecoration(
+        color: AppColors.kPill,
+        shape: BoxShape.circle,
+      ),
       child: Icon(icon, color: AppColors.kLabel),
     );
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+      child: Row(
         children: [
-          Row(
-            children: [
-              pill(Icons.emoji_events_outlined),
-              const SizedBox(width: 12),
-              pill(Icons.emoji_events_outlined),
-              const SizedBox(width: 12),
-              pill(Icons.emoji_events_outlined),
-            ],
-          ),
+          // pode trocar por um scroll horizontal se tiver mais de 3
+          // aqui deixei 3 fixos como no seu layout
+          _Pill(icon: Icons.emoji_events_outlined),
+          SizedBox(width: 12),
+          _Pill(icon: Icons.emoji_events_outlined),
+          SizedBox(width: 12),
+          _Pill(icon: Icons.emoji_events_outlined),
         ],
       ),
     );
   }
 }
 
-// BLOCO 6 — Card de contribuição
-class _ContribCard extends StatelessWidget {
+class _Pill extends StatelessWidget {
+  const _Pill({required this.icon});
+  final IconData icon;
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.kCard,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [
-            BoxShadow(
-              blurRadius: 10,
-              color: Color(0x11000000),
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // status chip
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEFF8FF),
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: const Color(0xFFD0E3FF)),
-                  ),
-                  child: const Text(
-                    'Em análise',
-                    style: TextStyle(fontSize: 12, color: AppColors.kPrimary),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Monitoramento Inteligente via IoT',
-                style: AppTextStyles.titleMd,
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Utilizar sensores de IoT nas linhas de embalagem para monitorar em tempo real o desempenho...',
-                style: AppTextStyles.body,
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Icon(
-                    Icons.favorite_border,
-                    size: 18,
-                    color: AppColors.kLabel,
-                  ),
-                  const SizedBox(width: 6),
-                  const Text(
-                    '0 votos',
-                    style: TextStyle(fontSize: 12, color: AppColors.kMuted),
-                  ),
-                  const Spacer(),
-                  const Text(
-                    '04 de Mai, 2025',
-                    style: TextStyle(fontSize: 12, color: AppColors.kMuted),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: const BoxDecoration(
+        color: AppColors.kPill,
+        shape: BoxShape.circle,
       ),
+      child: Icon(icon, color: AppColors.kLabel),
     );
   }
 }
 
-// BLOCO 7 — Chips “Áreas de Inovação”
+// ======= BLOCO 4 — Minhas contribuições (carrossel + JSON) ======
+class _MinhasIdeiasSliver extends StatelessWidget {
+  const _MinhasIdeiasSliver();
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: FutureBuilder<List<Idea>>(
+        future: IdeaRepository.loadFromAssets(),
+        builder: (context, snap) {
+          if (snap.connectionState == ConnectionState.waiting) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+          if (snap.hasError) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              child: Text('Erro ao carregar: ${snap.error}'),
+            );
+          }
+          final itens = snap.data ?? [];
+          if (itens.isEmpty) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              child: Text('Você ainda não enviou contribuições.'),
+            );
+          }
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(
+                dragDevices: {
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.mouse,
+                  PointerDeviceKind.trackpad,
+                },
+              ),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: List.generate(itens.length, (i) {
+                    final c = itens[i];
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        right: i == itens.length - 1 ? 0 : 12,
+                      ),
+                      child: IdeaCard(
+                        statusLabel: c.status,
+                        title: c.title,
+                        summary: c.summary,
+                        votes: c.votes,
+                        date: c.date,
+                        onTap: () {
+                          // TODO: navegar para detalhe da contribuição
+                        },
+                        statusColor: _mapStatusBg(c.status),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // mapeamento simples de cor do chip por status
+  static Color _mapStatusBg(String status) {
+    switch (status) {
+      case 'Em análise':
+        return const Color(0xFFEFF8FF);
+      case 'Aprovada':
+        return const Color(0xFFE8F5E9);
+      case 'Recusada':
+        return const Color(0xFFFFEBEE);
+      case 'Melhoria Solicitada':
+        return const Color(0xFFFFF5E6);
+      default:
+        return const Color(0xFFEAF3FF);
+    }
+  }
+}
+
+// ======= BLOCO 7 — Chips “Áreas de Inovação” (scroll) ===========
 class _ChipsArea extends StatefulWidget {
+  const _ChipsArea();
+
   @override
   State<_ChipsArea> createState() => _ChipsAreaState();
 }
@@ -310,91 +359,44 @@ class _ChipsAreaState extends State<_ChipsArea> {
     'Open Innovation',
     'Design',
   ];
-  int selected = 0; // “Data” inicialmente
+  int selected = 0;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: List.generate(chips.length, (i) {
-            final isSelected = i == selected;
-            return Padding(
-              padding: EdgeInsets.only(right: i == chips.length - 1 ? 0 : 8),
-              child: FilterChip(
-                showCheckmark: false, // ① sem check
-                selected: isSelected,
-                label: Text(chips[i]),
-                onSelected: (_) => setState(() => selected = i),
-                selectedColor: const Color(
-                  0xFFD7E7FF,
-                ), // ② cor + escura quando selecionado
-                backgroundColor: const Color(0xFFEAF3FF),
-                labelStyle: TextStyle(
-                  color: isSelected ? AppColors.kHeaderTop : Colors.black87,
-                  fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
-                ),
-                shape: StadiumBorder(side: BorderSide(color: AppColors.kPill)),
-              ),
-            );
-          }),
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(
+          dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
+            PointerDeviceKind.trackpad,
+          },
         ),
-      ),
-    );
-  }
-}
-
-// BLOCO 8 — Card de Desafio Ativo
-class _DesafioCard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.kCard,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [
-            BoxShadow(
-              blurRadius: 10,
-              color: Color(0x11000000),
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // “Comercial” etiqueta
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: List.generate(chips.length, (i) {
+              final isSelected = i == selected;
+              return Padding(
+                padding: EdgeInsets.only(right: i == chips.length - 1 ? 0 : 8),
+                child: FilterChip(
+                  showCheckmark: false,
+                  selected: isSelected,
+                  label: Text(chips[i]),
+                  onSelected: (_) => setState(() => selected = i),
+                  selectedColor: AppColors.kPill,
+                  backgroundColor: AppColors.kPill,
+                  labelStyle: TextStyle(
+                    color: Colors.black87,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                  ),
+                  shape: StadiumBorder(
+                    side: BorderSide(color: AppColors.kPill),
+                  ),
                 ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFE5E5),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: const Text(
-                  'Comercial',
-                  style: TextStyle(fontSize: 12, color: AppColors.kDanger),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Transformação digital para farmácias independentes',
-                style: AppTextStyles.titleMd,
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Como podemos apoiar farmácias independentes em seu processo de transformação digital?',
-                style: AppTextStyles.body,
-              ),
-            ],
+              );
+            }),
           ),
         ),
       ),
@@ -402,7 +404,105 @@ class _DesafioCard extends StatelessWidget {
   }
 }
 
-// Título de seção reutilizável
+// ======= BLOCO 8 — Desafios Ativos (carrossel, com params) ======
+class _DesafiosAtivosSliver extends StatelessWidget {
+  const _DesafiosAtivosSliver();
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: FutureBuilder<List<Challenge>>(
+        future: ChallengeRepository.loadFromAssets(),
+        builder: (context, snap) {
+          if (snap.connectionState == ConnectionState.waiting) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+          if (snap.hasError) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              child: Text('Erro ao carregar desafios: ${snap.error}'),
+            );
+          }
+
+          final desafios = snap.data ?? [];
+          if (desafios.isEmpty) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              child: Text('Nenhum desafio ativo no momento.'),
+            );
+          }
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(
+                dragDevices: {
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.mouse,
+                  PointerDeviceKind.trackpad,
+                },
+              ),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: List.generate(desafios.length, (i) {
+                    final d = desafios[i];
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        right: i == desafios.length - 1 ? 0 : 12,
+                      ),
+                      child: ChallengeCard(
+                        badgeLabel: d.area,
+                        title: d.title,
+                        summary: d.summary,
+                        badgeColor: _mapBadgeColor(d.area),
+                        badgeTextColor: _mapBadgeTextColor(d.area),
+                        onTap: () {
+                          // TODO: navegar para detalhes do desafio
+                        },
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Color _mapBadgeColor(String area) {
+    switch (area) {
+      case 'Comercial':
+        return const Color(0xFFFFE5E5);
+      case 'Supply':
+        return const Color(0xFFE8F5E9);
+      case 'P&D':
+        return const Color(0xFFFFF5E6);
+      default:
+        return const Color(0xFFEAF3FF);
+    }
+  }
+
+  Color _mapBadgeTextColor(String area) {
+    switch (area) {
+      case 'Comercial':
+        return AppColors.kDanger;
+      case 'Supply':
+        return const Color(0xFF1B5E20);
+      case 'P&D':
+        return const Color(0xFF9C6D00);
+      default:
+        return Colors.black87;
+    }
+  }
+}
+
+// =============== Títulos reutilizáveis ==========================
 class _SectionTitle extends StatelessWidget {
   final String title;
   final Widget? trailing;
@@ -418,6 +518,30 @@ class _SectionTitle extends StatelessWidget {
             child: Text(
               title,
               style: AppTextStyles.titleLg.copyWith(fontSize: 18),
+            ),
+          ),
+          if (trailing != null) trailing!,
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionSubTitle extends StatelessWidget {
+  final String title;
+  final Widget? trailing;
+  const _SectionSubTitle({required this.title, this.trailing});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: AppTextStyles.titleLg.copyWith(fontSize: 14),
             ),
           ),
           if (trailing != null) trailing!,

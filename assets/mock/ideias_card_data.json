@@ -1,0 +1,23 @@
+[
+  {
+    "status": "Em análise",
+    "title": "Monitoramento Inteligente via IoT",
+    "summary": "Utilizar sensores de IoT nas linhas de embalagem para monitorar em tempo real o desempenho das máquinas e prever falhas.",
+    "votes": 12,
+    "date": "2025-05-04T00:00:00.000Z"
+  },
+  {
+    "status": "Aprovada",
+    "title": "Gamificação para Engajamento",
+    "summary": "Implementar um sistema de pontos e recompensas para aumentar o engajamento dos colaboradores nos treinamentos.",
+    "votes": 45,
+    "date": "2025-04-12T00:00:00.000Z"
+  },
+  {
+    "status": "Recusada",
+    "title": "Substituição de Software de ERP",
+    "summary": "Migrar o sistema ERP para uma plataforma nova baseada em nuvem para reduzir custos de manutenção.",
+    "votes": 3,
+    "date": "2025-03-20T00:00:00.000Z"
+  }
+]

@@ -1,8 +1,13 @@
 import 'package:eurohub/routes.dart';
 import 'package:eurohub/theme/app_colors.dart';
+import 'package:eurohub/widgets/challenge_card.dart';
 import 'package:flutter/material.dart';
 
-// Tipos de texto locais (opcional: pode mover p/ um theme depois)
+// modelo + repositório
+import 'package:eurohub/models/challenge.dart';
+import 'package:eurohub/data/challenge_repository.dart';
+
+// Tipos de texto locais (opcional: mover p/ theme depois)
 TextStyle get titleLg =>
     const TextStyle(fontSize: 20, fontWeight: FontWeight.w700);
 TextStyle get titleMd =>
@@ -15,20 +20,78 @@ class ChallengesTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.kBg,
+      backgroundColor: AppColors.kCard,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            SliverToBoxAdapter(child: Header()),
-            // SliverToBoxAdapter(child: _SearchPill()),
-            SliverToBoxAdapter(child: SizedBox(height: 25)),
-            SliverToBoxAdapter(
-              child: _DesafioCard(
-                id: 'c1',
-                tag: 'Comercial',
-                title: 'Transformação digital para farmácias independentes',
-                description:
-                    'Como podemos apoiar farmácias independentes em seu processo de transformação digital?',
+            const SliverToBoxAdapter(child: _Header()),
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
+
+            // const SliverToBoxAdapter(child: _SearchPill()),
+            // const SliverToBoxAdapter(child: SizedBox(height: 16)),
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: 24),
+              sliver: FutureBuilder<List<Challenge>>(
+                future: ChallengeRepository.loadFromAssets(),
+                builder: (context, snap) {
+                  if (snap.connectionState == ConnectionState.waiting) {
+                    return const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 24,
+                        ),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                    );
+                  }
+                  if (snap.hasError) {
+                    return SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 24,
+                        ),
+                        child: Text('Erro ao carregar desafios: ${snap.error}'),
+                      ),
+                    );
+                  }
+
+                  final itens = snap.data ?? [];
+                  if (itens.isEmpty) {
+                    return const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 24,
+                        ),
+                        child: Text('Nenhum desafio ativo no momento.'),
+                      ),
+                    );
+                  }
+
+                  // Lista vertical (estilo RecyclerView)
+                  return SliverList.separated(
+                    itemCount: itens.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (context, i) {
+                      final d = itens[i];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: ChallengeCard(
+                          badgeLabel: d.area,
+                          title: d.title,
+                          summary: d.summary,
+                          badgeColor: _mapBadgeColor(d.area),
+                          badgeTextColor: _mapBadgeTextColor(d.area),
+                          onTap: () {
+                            // TODO: navegar para detalhes do desafio
+                          },
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ],
@@ -38,29 +101,48 @@ class ChallengesTab extends StatelessWidget {
   }
 }
 
-// BLOCO 1 - HEADER
-class Header extends StatelessWidget {
-  const Header({super.key});
+Color _mapBadgeColor(String area) {
+  switch (area) {
+    case 'Comercial':
+      return const Color(0xFFFFE5E5);
+    case 'Supply':
+      return const Color(0xFFE8F5E9);
+    case 'P&D':
+      return const Color(0xFFFFF5E6);
+    default:
+      return const Color(0xFFEAF3FF);
+  }
+}
+
+Color _mapBadgeTextColor(String area) {
+  switch (area) {
+    case 'Comercial':
+      return AppColors.kDanger;
+    case 'Supply':
+      return const Color(0xFF1B5E20);
+    case 'P&D':
+      return const Color(0xFF9C6D00);
+    default:
+      return Colors.black87;
+  }
+}
+
+// ---------- HEADER ----------
+class _Header extends StatelessWidget {
+  const _Header();
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          RichText(
-            text: TextSpan(
-              style: const TextStyle(color: Colors.black, fontSize: 22),
-              children: const [
-                TextSpan(
-                  text: 'Desafios',
-                  style: TextStyle(fontWeight: FontWeight.w700),
-                ),
-              ],
-            ),
+          Text(
+            'Desafios',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           Text(
             'Participe dos desafios abertos e colabore com ideias que podem transformar a Eurofarma.',
           ),
@@ -70,7 +152,10 @@ class Header extends StatelessWidget {
   }
 }
 
+// ---------- SEARCH PILL (opcional) ----------
 class _SearchPill extends StatelessWidget {
+  const _SearchPill();
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -82,8 +167,8 @@ class _SearchPill extends StatelessWidget {
           color: AppColors.kPill,
           borderRadius: BorderRadius.circular(22),
         ),
-        child: Row(
-          children: const [
+        child: const Row(
+          children: [
             Icon(Icons.search_rounded, color: AppColors.kLabel),
             SizedBox(width: 8),
             Expanded(
@@ -94,82 +179,6 @@ class _SearchPill extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// BLOCO 8 — Card de Desafio Ativo
-
-class _DesafioCard extends StatelessWidget {
-  final String id;
-  final String tag;
-  final String title;
-  final String description;
-
-  const _DesafioCard({
-    super.key,
-    required this.id,
-    required this.tag,
-    required this.title,
-    required this.description,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-      child: Material(
-        // material p/ efeito de ripple
-        color: AppColors.kCard,
-        borderRadius: BorderRadius.circular(12),
-        elevation: 2,
-        shadowColor: const Color(0x11000000),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: () {
-            Navigator.pushNamed(
-              context,
-              Routes.challengeDetail,
-              arguments: {
-                'id': id,
-                'tag': tag,
-                'title': title,
-                'description': description,
-              },
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // etiqueta
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFE5E5),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Text(
-                    tag,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.kDanger,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(title, style: titleMd),
-                const SizedBox(height: 6),
-                Text(description, style: body),
-              ],
-            ),
-          ),
         ),
       ),
     );
