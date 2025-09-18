@@ -38,7 +38,7 @@ class ChallengeDetailsScreen extends StatelessWidget {
                       children: [
                         // sua imagem de fundo
                         Image.asset(
-                          'assets/images/desafio_header.jpg', // troque pelo seu asset
+                          'assets/images/bg-challenge.png', // troque pelo seu asset
                           fit: BoxFit.cover,
                         ),
                         // overlay para ler o texto

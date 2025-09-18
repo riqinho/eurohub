@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Eurohub',
-      initialRoute: Routes.home,
+      initialRoute: Routes.login,
       onGenerateRoute: Routes.generateRoute,
       debugShowCheckedModeBanner: false,
     );

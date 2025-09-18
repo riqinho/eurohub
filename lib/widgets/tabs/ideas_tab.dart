@@ -51,6 +51,8 @@ class Header extends StatelessWidget {
 
 // BLOCO 2 - STATUS
 class ChipsStatus extends StatefulWidget {
+  const ChipsStatus({super.key});
+
   @override
   State<ChipsStatus> createState() => ChipsStatusState();
 }
@@ -63,7 +65,17 @@ class ChipsStatusState extends State<ChipsStatus> {
     'Recusada',
     'Aprovada',
   ];
-  int selected = 0; // “Data” inicialmente
+
+  /// Aqui você define a cor para cada status na mesma ordem da lista acima
+  final chipColors = const [
+    Color(0xFFEAF3FF), // Tudo
+    Color(0xFFEFF8FF), // Em análise
+    Color(0xFFFFF5E6), // Melhoria solicitada
+    Color(0xFFFFEBEE), // Recusada
+    Color(0xFFE8F5E9), // Aprovada
+  ];
+
+  int selected = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -77,19 +89,19 @@ class ChipsStatusState extends State<ChipsStatus> {
             return Padding(
               padding: EdgeInsets.only(right: i == chips.length - 1 ? 0 : 8),
               child: FilterChip(
-                showCheckmark: false, // ① sem check
+                showCheckmark: false,
                 selected: isSelected,
                 label: Text(chips[i]),
                 onSelected: (_) => setState(() => selected = i),
-                selectedColor: const Color(
-                  0xFFD7E7FF,
-                ), // ② cor + escura quando selecionado
-                backgroundColor: const Color(0xFFEAF3FF),
+                selectedColor: chipColors[i].withOpacity(0.8), // cor mais escura
+                backgroundColor: chipColors[i], // cor de fundo
                 labelStyle: TextStyle(
                   color: isSelected ? AppColors.kHeaderTop : Colors.black87,
-                  fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
-                shape: StadiumBorder(side: BorderSide(color: AppColors.kPill)),
+                shape: StadiumBorder(
+                  side: BorderSide(color: chipColors[i].withOpacity(0.8)),
+                ),
               ),
             );
           }),
@@ -98,6 +110,7 @@ class ChipsStatusState extends State<ChipsStatus> {
     );
   }
 }
+
 
 //  BLOCO 3 - IDEIAS
 class ContribCard extends StatelessWidget {

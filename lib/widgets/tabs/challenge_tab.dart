@@ -20,7 +20,8 @@ class ChallengesTab extends StatelessWidget {
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(child: Header()),
-            SliverToBoxAdapter(child: _SearchPill()),
+            // SliverToBoxAdapter(child: _SearchPill()),
+            SliverToBoxAdapter(child: SizedBox(height: 25)),
             SliverToBoxAdapter(
               child: _DesafioCard(
                 id: 'c1',
@@ -50,7 +51,7 @@ class Header extends StatelessWidget {
         children: [
           RichText(
             text: TextSpan(
-              style: const TextStyle(color: Colors.black, fontSize: 18),
+              style: const TextStyle(color: Colors.black, fontSize: 22),
               children: const [
                 TextSpan(
                   text: 'Desafios',
@@ -59,6 +60,7 @@ class Header extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 10),
           Text(
             'Participe dos desafios abertos e colabore com ideias que podem transformar a Eurofarma.',
           ),
