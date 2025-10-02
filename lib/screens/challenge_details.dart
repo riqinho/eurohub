@@ -26,11 +26,12 @@ class ChallengeDetailsScreen extends StatelessWidget {
                 SliverAppBar(
                   leading: IconButton(
                     icon: const Icon(Icons.arrow_back),
+                    color: Colors.white,
                     onPressed: () => Navigator.pop(context),
                   ),
                   pinned: true,
                   expandedHeight: 220,
-                  backgroundColor: AppColors.kPrimary,
+                  backgroundColor: AppColors.kHeaderTop,
                   elevation: 0,
                   flexibleSpace: FlexibleSpaceBar(
                     collapseMode: CollapseMode.parallax,

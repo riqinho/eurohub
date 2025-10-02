@@ -69,7 +69,7 @@ class ChallengeCard extends StatelessWidget {
                   Text(
                     title,
                     style: AppTextStyles.titleMd,
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 6),

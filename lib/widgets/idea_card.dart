@@ -58,13 +58,12 @@ class IdeaCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: statusColor ?? const Color(0xFFEFF8FF),
                       borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: AppColors.kLabel),
                     ),
                     child: Text(
                       statusLabel,
                       style: const TextStyle(
                         fontSize: 12,
-                        color: AppColors.kPrimary,
+                        color: Color.fromARGB(255, 57, 63, 75),
                       ),
                     ),
                   ),

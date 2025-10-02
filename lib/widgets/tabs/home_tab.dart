@@ -2,12 +2,10 @@ import 'package:eurohub/data/challenge_repository.dart';
 import 'package:eurohub/data/idea_repository.dart';
 import 'package:eurohub/models/challenge.dart';
 import 'package:eurohub/models/ideia.dart';
-import 'package:eurohub/routes.dart';
 import 'package:eurohub/theme/app_colors.dart';
 import 'package:eurohub/theme/app_text.dart';
 import 'package:eurohub/widgets/challenge_card.dart';
-import 'package:eurohub/widgets/idea_card.dart'; // (se não usar, pode remover)
-import 'package:eurohub/widgets/tabs/ideas_tab.dart'; // (se não usar, pode remover)
+import 'package:eurohub/widgets/idea_card.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -37,12 +35,12 @@ class HomeTab extends StatelessWidget {
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 22)),
 
-            // ---------- BLOCO 3: Conquistas ----------
+            // ---------- BLOCO 3: Conquistas (BADGES COLORIDOS) ----------
             const SliverToBoxAdapter(
               child: _SectionSubTitle(title: 'Conquistas Recentes'),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 10)),
-            const SliverToBoxAdapter(child: _ConquistasRow()),
+            const SliverToBoxAdapter(child: _ConquistasRow()), // <- atualizado
             const SliverToBoxAdapter(child: SizedBox(height: 22)),
 
             // ---------- BLOCO 4: Minhas contribuições (carrossel + JSON) ----------
@@ -72,10 +70,10 @@ class HomeTab extends StatelessWidget {
               child: _SectionSubTitle(title: 'Áreas de Inovação'),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 10)),
-            SliverToBoxAdapter(child: _ChipsArea()),
+            const SliverToBoxAdapter(child: _ChipsArea()),
             const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
-            // ---------- BLOCO 8: Desafios Ativos (carrossel) ----------
+            // ---------- BLOCO 8: Desafios Ativos (carrossel com tamanho fixo) ----------
             SliverToBoxAdapter(
               child: _SectionSubTitle(
                 title: 'Desafios Ativos',
@@ -88,7 +86,7 @@ class HomeTab extends StatelessWidget {
                 ),
               ),
             ),
-            const _DesafiosAtivosSliver(), // <<< carrossel horizontal
+            const _DesafiosAtivosSliver(), // <<< agora com largura/altura fixas
             const SliverToBoxAdapter(child: SizedBox(height: 32)),
           ],
         ),
@@ -186,7 +184,9 @@ class LevelCard extends StatelessWidget {
                       value: value,
                       minHeight: 10,
                       backgroundColor: theme.colorScheme.outlineVariant,
-                      valueColor: AlwaysStoppedAnimation(AppColors.kHeaderTop),
+                      valueColor: const AlwaysStoppedAnimation(
+                        AppColors.kHeaderTop,
+                      ),
                     );
                   },
                 ),
@@ -204,53 +204,83 @@ class LevelCard extends StatelessWidget {
   }
 }
 
-// ================= BLOCO 3 — Conquistas (3 troféus) =============
+// ================= BLOCO 3 — Conquistas (BADGES COLORIDOS) =============
 class _ConquistasRow extends StatelessWidget {
   const _ConquistasRow();
 
   @override
   Widget build(BuildContext context) {
-    Widget pill(IconData icon) => Container(
-      width: 56,
-      height: 56,
-      decoration: const BoxDecoration(
-        color: AppColors.kPill,
-        shape: BoxShape.circle,
-      ),
-      child: Icon(icon, color: AppColors.kLabel),
-    );
+    const badges = [
+      _BadgeData(Icons.star, 'Inovador', Colors.amber),
+      _BadgeData(Icons.flash_on, 'Engajado', Colors.orange),
+      _BadgeData(Icons.leaderboard, 'Top 10', Colors.blue),
+      _BadgeData(Icons.handshake, 'Colaborador', Colors.green),
+    ];
 
-    return const Padding(
-      padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-      child: Row(
-        children: [
-          // pode trocar por um scroll horizontal se tiver mais de 3
-          // aqui deixei 3 fixos como no seu layout
-          _Pill(icon: Icons.emoji_events_outlined),
-          SizedBox(width: 12),
-          _Pill(icon: Icons.emoji_events_outlined),
-          SizedBox(width: 12),
-          _Pill(icon: Icons.emoji_events_outlined),
-        ],
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(
+          dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
+            PointerDeviceKind.trackpad,
+          },
+        ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: List.generate(badges.length, (i) {
+              final b = badges[i];
+              return Padding(
+                padding: EdgeInsets.only(
+                  right: i == badges.length - 1 ? 0 : 12,
+                ),
+                child: _Badge(icon: b.icon, label: b.label, color: b.color),
+              );
+            }),
+          ),
+        ),
       ),
     );
   }
 }
 
-class _Pill extends StatelessWidget {
-  const _Pill({required this.icon});
+class _BadgeData {
   final IconData icon;
+  final String label;
+  final Color color;
+  const _BadgeData(this.icon, this.label, this.color);
+}
+
+class _Badge extends StatelessWidget {
+  const _Badge({required this.icon, required this.label, required this.color});
+
+  final IconData icon;
+  final String label;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 56,
-      height: 56,
-      decoration: const BoxDecoration(
-        color: AppColors.kPill,
-        shape: BoxShape.circle,
+    return SizedBox(
+      width: 88,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircleAvatar(
+            radius: 24,
+            backgroundColor: color.withOpacity(0.18),
+            child: Icon(icon, color: color, size: 22),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
-      child: Icon(icon, color: AppColors.kLabel),
     );
   }
 }
@@ -391,7 +421,7 @@ class _ChipsAreaState extends State<_ChipsArea> {
                     color: Colors.black87,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
                   ),
-                  shape: StadiumBorder(
+                  shape: const StadiumBorder(
                     side: BorderSide(color: AppColors.kPill),
                   ),
                 ),
@@ -404,9 +434,12 @@ class _ChipsAreaState extends State<_ChipsArea> {
   }
 }
 
-// ======= BLOCO 8 — Desafios Ativos (carrossel, com params) ======
+// ======= BLOCO 8 — Desafios Ativos (carrossel com tamanho fixo) ======
 class _DesafiosAtivosSliver extends StatelessWidget {
   const _DesafiosAtivosSliver();
+
+  static const double _cardWidth = 260; // largura fixa para todos
+  static const double _cardHeight = 168; // altura fixa para todos
 
   @override
   Widget build(BuildContext context) {
@@ -454,15 +487,20 @@ class _DesafiosAtivosSliver extends StatelessWidget {
                       padding: EdgeInsets.only(
                         right: i == desafios.length - 1 ? 0 : 12,
                       ),
-                      child: ChallengeCard(
-                        badgeLabel: d.area,
-                        title: d.title,
-                        summary: d.summary,
-                        badgeColor: _mapBadgeColor(d.area),
-                        badgeTextColor: _mapBadgeTextColor(d.area),
-                        onTap: () {
-                          // TODO: navegar para detalhes do desafio
-                        },
+                      child: SizedBox(
+                        // <- garante tamanho idêntico
+                        width: _cardWidth,
+                        height: _cardHeight,
+                        child: ChallengeCard(
+                          badgeLabel: d.area,
+                          title: d.title,
+                          summary: d.summary,
+                          badgeColor: _mapBadgeColor(d.area),
+                          badgeTextColor: _mapBadgeTextColor(d.area),
+                          onTap: () {
+                            // TODO: navegar para detalhes do desafio
+                          },
+                        ),
                       ),
                     );
                   }),
