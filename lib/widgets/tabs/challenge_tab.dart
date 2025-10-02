@@ -87,6 +87,8 @@ class ChallengesTab extends StatelessWidget {
                           onTap: () {
                             // TODO: navegar para detalhes do desafio
                           },
+                          oQueQueremosResolver: d.oQueQueremosResolver,
+                          oQueBuscamos: d.oQueBuscamos,
                         ),
                       );
                     },

@@ -500,6 +500,8 @@ class _DesafiosAtivosSliver extends StatelessWidget {
                           onTap: () {
                             // TODO: navegar para detalhes do desafio
                           },
+                          oQueQueremosResolver: d.oQueQueremosResolver,
+                          oQueBuscamos: d.oQueBuscamos,
                         ),
                       ),
                     );

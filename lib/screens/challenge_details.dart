@@ -12,8 +12,14 @@ class ChallengeDetailsScreen extends StatelessWidget {
 
     final String title = (args?['title'] as String?) ?? 'Título do desafio';
     final String tag = (args?['tag'] as String?) ?? 'Comercial';
-    final String desc =
-        (args?['description'] as String?) ?? 'Descrição breve do desafio…';
+    final String summary =
+        (args?['summary'] as String?) ?? 'Descrição breve do desafio…';
+    final String oQueQueremosResolver =
+        (args?['oQueQueremosResolver'] as String?) ??
+        'Descrição detalhada do que queremos resolver com esse desafio…';
+    final String oQueBuscamos =
+        (args?['oQueBuscamos'] as String?) ??
+        'Descrição detalhada do que buscamos com esse desafio…';
 
     return DefaultTabController(
       length: 2,
@@ -94,12 +100,6 @@ class ChallengeDetailsScreen extends StatelessWidget {
               ListView(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                 children: [
-                  _Tag(
-                    text: tag,
-                    bg: const Color(0xFFFFE5E5),
-                    fg: AppColors.kDanger,
-                  ),
-                  const SizedBox(height: 12),
                   Text(
                     title,
                     style: const TextStyle(
@@ -108,23 +108,23 @@ class ChallengeDetailsScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(desc, style: const TextStyle(color: AppColors.kMuted)),
+                  Text(
+                    summary,
+                    style: const TextStyle(color: AppColors.kMuted),
+                  ),
                   const SizedBox(height: 20),
 
                   // Seções de exemplo (troque pelo seu conteúdo real)
                   const _SectionTitle('O que queremos resolver?'),
                   const SizedBox(height: 6),
-                  const Text(
-                    'Coloque aqui o texto explicando o problema que o desafio quer resolver.',
+                  Text(
+                    oQueQueremosResolver,
                     style: TextStyle(color: AppColors.kMuted),
                   ),
                   const SizedBox(height: 16),
                   const _SectionTitle('O que buscamos?'),
                   const SizedBox(height: 6),
-                  const Text(
-                    'Coloque aqui os objetivos/expectativas das ideias.',
-                    style: TextStyle(color: AppColors.kMuted),
-                  ),
+                  Text(oQueBuscamos, style: TextStyle(color: AppColors.kMuted)),
                   const SizedBox(height: 16),
                   const Divider(),
                   const SizedBox(height: 16),

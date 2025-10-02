@@ -36,7 +36,17 @@ class IdeaCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: () {
-            Navigator.pushNamed(context, Routes.ideaDetail);
+            Navigator.pushNamed(
+              context,
+              Routes.ideaDetail,
+              arguments: {
+                'status': statusLabel,
+                'title': title,
+                'summary': summary,
+                'votes': votes,
+                'date': date.toIso8601String(),
+              },
+            );
           },
           child: Container(
             decoration: BoxDecoration(

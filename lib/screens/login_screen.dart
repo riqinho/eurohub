@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Positioned(
                       left: 0,
                       right: 0,
-                      bottom: -55,
+                      bottom: -30,
                       child: SvgPicture.asset(
                         'assets/images/wave.svg',
                         width: w,

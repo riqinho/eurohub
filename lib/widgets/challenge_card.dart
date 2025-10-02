@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 class ChallengeCard extends StatelessWidget {
   const ChallengeCard({
     super.key,
+    required this.oQueQueremosResolver,
+    required this.oQueBuscamos,
     required this.badgeLabel,
     required this.title,
     required this.summary,
@@ -23,6 +25,8 @@ class ChallengeCard extends StatelessWidget {
   final Color badgeTextColor;
   final VoidCallback? onTap;
   final double width;
+  final String oQueQueremosResolver;
+  final String oQueBuscamos;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +41,12 @@ class ChallengeCard extends StatelessWidget {
             Navigator.pushNamed(
               context,
               Routes.challengeDetail,
-              arguments: {'title': title},
+              arguments: {
+                'title': title,
+                'summary': summary,
+                'oQueQueremosResolver': oQueQueremosResolver,
+                'oQueBuscamos': oQueBuscamos,
+              },
             );
           },
           child: Container(

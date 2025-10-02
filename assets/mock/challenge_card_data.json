@@ -4,6 +4,8 @@
     "area": "Comercial",
     "title": "Transformação digital para farmácias independentes",
     "summary": "Como apoiar farmácias independentes no processo de transformação digital?",
+    "o_que_queremos_resolver": "Baixa digitalização em farmácias independentes: ausência de presença online, dados de vendas/estoque fragmentados, falta de CRM e dificuldade em organizar pedidos e relacionamento com representantes, o que reduz eficiência comercial e competitividade.",
+    "o_que_buscamos": "Soluções que facilitem onboarding digital (catálogo e pedidos online), integração com PDV/ERP, CRM simples para visitas, meios de pagamento e promoções, além de dashboards com métricas de vendas. Preferencialmente com prova de conceito em 1–2 redes de farmácias.",
     "deadline": "2025-11-10T23:59:59.000Z",
     "status": "Ativo",
     "likes": 18
@@ -13,6 +15,8 @@
     "area": "Supply",
     "title": "Otimização de rotas de entrega",
     "summary": "Reduzir tempo e custo de transporte usando previsão de demanda e janelas de entrega.",
+    "o_que_queremos_resolver": "Rotas planejadas manualmente, sem considerar em tempo real restrições de janela, capacidade, trânsito e variação de demanda, resultando em maior custo por entrega, atrasos e baixa taxa de ocupação da frota.",
+    "o_que_buscamos": "Algoritmo/serviço de roteirização (VRP) com restrições, previsão de demanda, replanejamento dinâmico e integração com TMS/ERP. Espera-se simulação de ganhos (custo, tempo, emissões) e piloto com monitoramento em dashboard.",
     "deadline": "2025-10-01T23:59:59.000Z",
     "status": "Ativo",
     "likes": 42
@@ -22,6 +26,8 @@
     "area": "P&D",
     "title": "Novos formatos sustentáveis",
     "summary": "Explorar alternativas de embalagem com menor impacto ambiental.",
+    "o_que_queremos_resolver": "Embalagens atuais com alto impacto ambiental (peso, material, reciclabilidade) e custos logísticos; falta de alternativas que mantenham barreira, estabilidade e experiência do usuário.",
+    "o_que_buscamos": "Propostas de novas embalagens/formatos (recicláveis, reciclados, biodegradáveis, refil, concentrados) com estudos de viabilidade, estimativa de redução de CO₂ e compatibilidade com linhas atuais. Preferência por protótipos e plano de testes/pilotos.",
     "deadline": "2025-12-05T23:59:59.000Z",
     "status": "Ativo",
     "likes": 7
